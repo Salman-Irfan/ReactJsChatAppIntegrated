@@ -1,10 +1,10 @@
 import React from 'react'
 import "./styles/global.css"
-import { Button, ButtonGroup } from '@chakra-ui/react'
 import { Route, Routes } from 'react-router-dom'
 import Register from './pages/auth/Register'
 import Login from './pages/auth/Login'
-import Home from './pages/Home'
+import HomePage from './pages/HomePage'
+import ChatPage from './pages/ChatPage'
 const App = () => {
   
 
@@ -12,7 +12,8 @@ const App = () => {
     <>
       
       <Routes>
-        <Route path='/' element={<Home/>}/>
+        <Route path='/' element={<HomePage/>}/>
+        <Route path='/chats' element={<ChatPage/>}/>
         {/* auth route */}
         <Route path='/auth/register' element={<Register/>}/>
         <Route path='/auth/login' element={<Login/>}/>
