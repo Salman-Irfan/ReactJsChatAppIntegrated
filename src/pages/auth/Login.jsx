@@ -21,9 +21,10 @@ const Login = () => {
                 email: email,
                 password: password
             });
-
             if(response.data.authtoken){
                 localStorage.setItem('authtoken', response.data.authtoken);
+                localStorage.setItem('userInfo', JSON.stringify(response.data.user));
+
                 toast({
                     title: 'Login Successful',
                     description: 'Redirecting to Chat Page.',
