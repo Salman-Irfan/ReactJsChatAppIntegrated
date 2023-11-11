@@ -11,8 +11,8 @@ import {
     TabPanel,
     Stack,
 } from '@chakra-ui/react';
-import Login from './auth/Login';
-import Register from './auth/Register';
+import Login from '../views/auth/Login';
+import Register from '../views/auth/Register';
 
 const HomePage = () => {
     return (

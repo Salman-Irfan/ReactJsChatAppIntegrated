@@ -1,8 +1,10 @@
 import { Box, Text, Input, Stack, Button, InputGroup, InputRightElement, useToast } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+    const navigate = useNavigate()
     const toast = useToast();
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
@@ -24,7 +26,6 @@ const Login = () => {
             if(response.data.authtoken){
                 localStorage.setItem('authtoken', response.data.authtoken);
                 localStorage.setItem('userInfo', JSON.stringify(response.data.user));
-
                 toast({
                     title: 'Login Successful',
                     description: 'Redirecting to Chat Page.',
@@ -32,6 +33,7 @@ const Login = () => {
                     duration: 1500,
                     isClosable: true,
                 });
+                navigate('/chats')
             }
         } catch (error) {
             console.error('Error logging in:', error);

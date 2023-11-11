@@ -1,8 +1,8 @@
 import React from 'react'
 import "./styles/global.css"
 import { Route, Routes } from 'react-router-dom'
-import Register from './pages/auth/Register'
-import Login from './pages/auth/Login'
+import Register from './views/auth/Register'
+import Login from './views/auth/Login'
 import HomePage from './pages/HomePage'
 import ChatPage from './pages/ChatPage'
 const App = () => {
