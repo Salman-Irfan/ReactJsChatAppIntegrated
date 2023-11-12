@@ -2,6 +2,7 @@ import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import { Avatar, Box, Button, Heading, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, Text, Tooltip } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { ChatState } from '../../Context/ChatProvider';
+import ProfileModal from './ProfileModal';
 
 const SideDrawer = () => {
     const { user } = ChatState();
@@ -56,7 +57,9 @@ const SideDrawer = () => {
 
                         <MenuList>
                             <MenuGroup title='Profile'>
-                                <MenuItem>My Profile</MenuItem>
+                                <ProfileModal user={user}>
+                                    <MenuItem>My Profile</MenuItem>
+                                </ProfileModal>
                                 <MenuDivider />
                                 <MenuItem
                                     bgColor='red.300'
