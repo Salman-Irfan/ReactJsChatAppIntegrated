@@ -3,13 +3,21 @@ import { Avatar, Box, Button, Heading, Menu, MenuButton, MenuDivider, MenuGroup,
 import React, { useState } from 'react'
 import { ChatState } from '../../Context/ChatProvider';
 import ProfileModal from './ProfileModal';
+import { useNavigate } from 'react-router-dom';
 
 const SideDrawer = () => {
+    const navigate = useNavigate()
     const { user } = ChatState();
     const [search, setSearch] = useState()
     const [searchResult, setSearchResult] = useState()
     const [loading, setLoading] = useState()
     const [loadingChat, setLoadingChat] = useState()
+
+    const logoutHandler = () => {
+        localStorage.removeItem('userInfo')
+        localStorage.removeItem('authtoken')
+        navigate('/')
+    }
     return (
         <>
 
@@ -65,7 +73,7 @@ const SideDrawer = () => {
                                     bgColor='red.300'
                                     color='whiteAlpha.900'
                                     _hover={{ bg: 'red.700', color: 'red.300' }}
-                                    onClick={() => console.log('Logout clicked')}
+                                    onClick={logoutHandler}
                                 >
                                     Logout
                                 </MenuItem>
