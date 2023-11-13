@@ -16,7 +16,7 @@ const SideDrawer = () => {
     const navigate = useNavigate()
     const toast = useToast()
     // context api
-    const { user } = ChatState();
+    const { user, setSelectedChat, chats, setChats } = ChatState();
     // state variables
     const [search, setSearch] = useState('')
     const [searchResult, setSearchResult] = useState()
@@ -65,6 +65,7 @@ const SideDrawer = () => {
         } catch (error) {
             toast({
                 title: "Error Occured",
+                description: error.message,
                 status: 'error',
                 duration: 1500,
                 isClosable: true,
@@ -74,8 +75,33 @@ const SideDrawer = () => {
         }
 
         // accessChat
-        const accessChat = (userId) => {
-
+        const accessChat = async (userId) => {
+            try {
+                setLoadingChat(true)
+                const config = {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${user.token}`
+                    }
+                }
+                // api request
+                const response = await axios.post(`${BASE_URL}${APIV}${endPoints.ACCESS_CHAT}`, {userId} ,config)
+                console.log(response)
+                const { data } = response
+                setSelectedChat(data)
+                setLoadingChat(data)
+                onClose()
+            } catch (error) {
+                toast({
+                    title: "Error Fetching the chat",
+                    description: error.messsage,
+                    status: 'error',
+                    duration: 1500,
+                    isClosable: true,
+                    position: 'bottom-left'
+                });
+                console.log(error)
+            }
         }
     }
     return (
