@@ -8,6 +8,7 @@ import axios from 'axios';
 import BASE_URL, { APIV } from '../../constants/baseUrl/baseUrl';
 import endPoints from '../../constants/endPoints/endPoints';
 import ChatLoading from '../loaders/ChatLoading';
+import UserListItem from '../../views/users/UserListItem';
 
 const SideDrawer = () => {
     // hooks
@@ -74,7 +75,7 @@ const SideDrawer = () => {
 
         // accessChat
         const accessChat = (userId) => {
-            
+
         }
     }
     return (
