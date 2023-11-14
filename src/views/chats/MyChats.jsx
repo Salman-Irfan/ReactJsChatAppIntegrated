@@ -7,6 +7,7 @@ import endPoints from '../../constants/endPoints/endPoints';
 import { AddIcon } from '@chakra-ui/icons';
 import ChatLoading from '../../components/loaders/ChatLoading.jsx';
 import { getSender } from '../../config/ChatLogics.js';
+import GroupChatModal from '../../components/miscellaneous/GroupChatModal.jsx';
 
 const MyChats = () => {
     // context api
@@ -74,14 +75,17 @@ const MyChats = () => {
                     <Text fontSize="2xl" fontWeight="bold">
                         My Chats
                     </Text>
-                    <Button
-                        display="flex"
-                        rightIcon={<AddIcon />}
-                        bg="#38b2ac" // Button background color
-                        _hover={{ bg: '#319795' }} // Hover effect
-                    >
-                        New Group Chat
-                    </Button>
+                    {/* create group button  */}
+                    <GroupChatModal>
+                        <Button
+                            display="flex"
+                            rightIcon={<AddIcon />}
+                            bg="#38b2ac" // Button background color
+                            _hover={{ bg: '#319795' }} // Hover effect
+                        >
+                            New Group Chat
+                        </Button>
+                    </GroupChatModal>
                 </Box>
 
                 {/* render chat users here */}
