@@ -6,13 +6,15 @@ import BASE_URL, { APIV } from '../../constants/baseUrl/baseUrl.js'
 import endPoints from '../../constants/endPoints/endPoints';
 import { AddIcon } from '@chakra-ui/icons';
 import ChatLoading from '../../components/loaders/ChatLoading.jsx';
+import { getSender } from '../../config/ChatLogics.js';
+
 const MyChats = () => {
     // context api
     const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
     // state variables
-    const [loggedUser, setLoggedUser] = useState()
+    const [loggedUser, setLoggedUser] = useState();
     // toast
-    const toast = useToast()
+    const toast = useToast();
     // api call to fetch chats
     const fetchChats = async () => {
         try {
@@ -22,12 +24,12 @@ const MyChats = () => {
                 }
             }
             const response = await axios.get(`${BASE_URL}${APIV}${endPoints.FETCH_CHAT}`, config)
-
             const { data } = response
+            console.log(data)
             setChats(data)
         } catch (error) {
             toast({
-                title: "Error Occured while fetching chat",
+                title: "Error Occurred while fetching chat",
                 description: error.message,
                 status: 'error',
                 duration: 1500,
@@ -37,6 +39,7 @@ const MyChats = () => {
             console.log(error)
         }
     }
+
     useEffect(() => {
         setLoggedUser(JSON.parse(localStorage.getItem('userInfo')));
         fetchChats()
@@ -55,6 +58,8 @@ const MyChats = () => {
                 borderWidth="1px"
                 bgGradient="linear(to-b, #1a1c20, #0d2834)" // Gradient effect
                 color="white"
+                height="100vh" // Set a fixed height for the sidebar
+                overflowY="auto" // Make the sidebar scrollable
             >
                 {/* chat header */}
                 <Box
@@ -79,18 +84,16 @@ const MyChats = () => {
                     </Button>
                 </Box>
 
-                {/* render chats here */}
+                {/* render chat users here */}
                 <Box
                     display={'flex'}
                     flexDir={'column'}
                     p={3}
                     w={'100%'}
-                    h={'100%'}
                     borderRadius={'lg'}
-                    overflowY={'hidden'}
                 >
                     {chats ? (
-                        <Stack overflowY={'scroll'}>
+                        <Stack>
                             {chats.map((chat) => (
                                 <Box
                                     onClick={() => setSelectedChat(chat)}
@@ -104,8 +107,7 @@ const MyChats = () => {
                                 >
                                     <Text>
                                         {!chat.isGroupChat ? (
-                                            // getSender(loggedUser, chat.users)
-                                            null
+                                            getSender(loggedUser, chat.users)
                                         ) : (
                                             chat.chatName
                                         )}
@@ -122,4 +124,4 @@ const MyChats = () => {
     )
 }
 
-export default MyChats
+export default MyChats;
