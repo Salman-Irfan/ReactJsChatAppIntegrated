@@ -35,7 +35,35 @@ const SideDrawer = () => {
         setSearch(e.target.value)
 
     }
-
+    // Define accessChat outside handleSearch
+    const accessChat = async (userId) => {
+        try {
+            setLoadingChat(true)
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${user.token}`
+                }
+            }
+            // api request
+            const response = await axios.post(`${BASE_URL}${APIV}${endPoints.ACCESS_CHAT}`, { userId }, config)
+            console.log(response)
+            const { data } = response
+            setSelectedChat(data)
+            setLoadingChat(false)  // Fixed: Update loading state to false
+            onClose()
+        } catch (error) {
+            toast({
+                title: "Error Fetching the chat",
+                description: error.message,
+                status: 'error',
+                duration: 1500,
+                isClosable: true,
+                position: 'bottom-left'
+            });
+            console.log(error)
+        }
+    }
     // user search handler
     const handleSearch = async () => {
         if (!search) {
@@ -75,34 +103,35 @@ const SideDrawer = () => {
         }
 
         // accessChat
-        const accessChat = async (userId) => {
-            try {
-                setLoadingChat(true)
-                const config = {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${user.token}`
-                    }
-                }
-                // api request
-                const response = await axios.post(`${BASE_URL}${APIV}${endPoints.ACCESS_CHAT}`, {userId} ,config)
-                console.log(response)
-                const { data } = response
-                setSelectedChat(data)
-                setLoadingChat(data)
-                onClose()
-            } catch (error) {
-                toast({
-                    title: "Error Fetching the chat",
-                    description: error.messsage,
-                    status: 'error',
-                    duration: 1500,
-                    isClosable: true,
-                    position: 'bottom-left'
-                });
-                console.log(error)
-            }
-        }
+        // const accessChat = async (userId) => {
+
+        //     try {
+        //         setLoadingChat(true)
+        //         const config = {
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //                 Authorization: `Bearer ${user.token}`
+        //             }
+        //         }
+        //         // api request
+        //         const response = await axios.post(`${BASE_URL}${APIV}${endPoints.ACCESS_CHAT}`, {userId} ,config)
+        //         console.log(response)
+        //         const { data } = response
+        //         setSelectedChat(data)
+        //         setLoadingChat(data)
+        //         onClose()
+        //     } catch (error) {
+        //         toast({
+        //             title: "Error Fetching the chat",
+        //             description: error.messsage,
+        //             status: 'error',
+        //             duration: 1500,
+        //             isClosable: true,
+        //             position: 'bottom-left'
+        //         });
+        //         console.log(error)
+        //     }
+        // }
     }
     return (
         <>
@@ -207,7 +236,7 @@ const SideDrawer = () => {
                                 <UserListItem
                                     key={user._id}
                                     user={user}
-                                    handleFunction={()=>accessChat(user._id)}
+                                    handleFunction={() => accessChat(user._id)} 
                                 />
                             ))
                         )}
