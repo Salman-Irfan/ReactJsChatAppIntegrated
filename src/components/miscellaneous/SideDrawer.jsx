@@ -1,5 +1,5 @@
 import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons'
-import { Avatar, Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, Heading, Input, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react'
+import { Avatar, Box, Button, Drawer, DrawerBody, DrawerCloseButton, DrawerContent, DrawerFooter, DrawerHeader, DrawerOverlay, Heading, Input, Menu, MenuButton, MenuDivider, MenuGroup, MenuItem, MenuList, Spinner, Text, Tooltip, useDisclosure, useToast } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { ChatState } from '../../Context/ChatProvider';
 import ProfileModal from './ProfileModal';
@@ -31,12 +31,13 @@ const SideDrawer = () => {
     }
     // handleUserSearchChange
     const handleUserSearchChange = (e) => {
-        // console.log(e.target.value)
+
         setSearch(e.target.value)
 
     }
     // Define accessChat outside handleSearch
-    const accessChat = async (userId) => {
+    const accessChat = async (receiverUserId) => {
+        console.log(receiverUserId)
         try {
             setLoadingChat(true)
             const config = {
@@ -46,9 +47,12 @@ const SideDrawer = () => {
                 }
             }
             // api request
-            const response = await axios.post(`${BASE_URL}${APIV}${endPoints.ACCESS_CHAT}`, { userId }, config)
-            console.log(response)
+            const response = await axios.post(`${BASE_URL}${APIV}${endPoints.ACCESS_CHAT}`, { receiverUserId }, config)
             const { data } = response
+            if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+            // if(!chats){
+            //     setChats(...chats);
+            // }
             setSelectedChat(data)
             setLoadingChat(false)  // Fixed: Update loading state to false
             onClose()
@@ -86,7 +90,6 @@ const SideDrawer = () => {
                 }
             }
             const response = await axios.get(`${BASE_URL}${APIV}${endPoints.GET_ALL_USERS}/?search=${search}`, config)
-            console.log(response)
             const { data } = response
             setLoading(false)
             setSearchResult(data)
@@ -102,36 +105,6 @@ const SideDrawer = () => {
             console.log(error)
         }
 
-        // accessChat
-        // const accessChat = async (userId) => {
-
-        //     try {
-        //         setLoadingChat(true)
-        //         const config = {
-        //             headers: {
-        //                 "Content-Type": "application/json",
-        //                 Authorization: `Bearer ${user.token}`
-        //             }
-        //         }
-        //         // api request
-        //         const response = await axios.post(`${BASE_URL}${APIV}${endPoints.ACCESS_CHAT}`, {userId} ,config)
-        //         console.log(response)
-        //         const { data } = response
-        //         setSelectedChat(data)
-        //         setLoadingChat(data)
-        //         onClose()
-        //     } catch (error) {
-        //         toast({
-        //             title: "Error Fetching the chat",
-        //             description: error.messsage,
-        //             status: 'error',
-        //             duration: 1500,
-        //             isClosable: true,
-        //             position: 'bottom-left'
-        //         });
-        //         console.log(error)
-        //     }
-        // }
     }
     return (
         <>
@@ -236,10 +209,13 @@ const SideDrawer = () => {
                                 <UserListItem
                                     key={user._id}
                                     user={user}
-                                    handleFunction={() => accessChat(user._id)} 
+                                    handleFunction={() => accessChat(user._id)}
                                 />
                             ))
                         )}
+                        {/* when the chat is being created, don't show loading anywhere */}
+                        {loadingChat && <Spinner ml={'auto'} display={'flex'} />}
+
                     </DrawerBody>
                     {/* footer, cancel button */}
                     <DrawerFooter>

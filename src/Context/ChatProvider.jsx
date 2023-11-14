@@ -8,12 +8,14 @@ const ChatProvider = ({ children }) => {
     // state variables
     const [user, setUser] = useState()
     const [selectedChat, setSelectedChat] = useState()
-    const [chats, setChats] = useState()
+    const [chats, setChats] = useState([])
     
     useEffect(() => {
         const userInfo = JSON.parse(localStorage.getItem("userInfo"))
         const authToken = localStorage.getItem("authtoken")
-        userInfo.token=authToken
+        if(authToken){
+            userInfo.token=authToken
+        }
         setUser(userInfo)
 
         if (!userInfo) {
