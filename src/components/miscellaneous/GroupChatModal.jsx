@@ -1,13 +1,14 @@
-import { Button, FormControl, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, useToast } from '@chakra-ui/react'
+import { Box, Button, FormControl, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Spinner, useDisclosure, useToast } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { ChatState } from '../../Context/ChatProvider'
 import axios from 'axios'
 import BASE_URL, { APIV } from '../../constants/baseUrl/baseUrl'
 import endPoints from '../../constants/endPoints/endPoints'
-
-const GroupChatModal = ({children}) => {
+import UserListItem from '../../views/users/UserListItem'
+import UserBadgeItem from './UserBadgeItem'
+const GroupChatModal = ({ children }) => {
     // context api
-    const {user, chats, setChats} = ChatState()
+    const { user, chats, setChats } = ChatState()
     // hooks
     const { isOpen, onOpen, onClose } = useDisclosure()
     const toast = useToast()
@@ -20,7 +21,7 @@ const GroupChatModal = ({children}) => {
     // functions
     const handleSearch = async (query) => {
         setSearch(query)
-        if(!query){
+        if (!query) {
             return
         }
         try {
@@ -32,7 +33,7 @@ const GroupChatModal = ({children}) => {
             }
             // console.log(config)
             const response = await axios.get(`${BASE_URL}${APIV}${endPoints.GET_ALL_USERS}/?search=${search}`, config)
-            const {data} = response
+            const { data } = response
             console.log(data)
             setLoading(false)
             setSearchResult(data)
@@ -52,6 +53,30 @@ const GroupChatModal = ({children}) => {
     const handleSubmit = () => {
 
     }
+    // handleGroup
+    const handleGroup = (userToAdd) => {
+        // if user is already added
+        if (selectedUsers.includes(userToAdd)) {
+            toast({
+                title: 'User already added',
+                status: 'warning',
+                duration: 1500,
+                isClosable: true,
+                position: 'top'
+            });
+            return
+        }
+        // add user to selected Users
+        setSelectedUsers([...selectedUsers, userToAdd])
+    };
+    // handleDelete
+    const handleDelete = (delUser) => {
+        setSelectedUsers(
+            selectedUsers.filter((sel)=>{
+                return sel._id !== delUser._id
+            })
+        )
+    };
     return (
         <>
             <span onClick={onOpen}>{children}</span>
@@ -78,7 +103,7 @@ const GroupChatModal = ({children}) => {
                             <Input
                                 placeholder='Group Chat Name'
                                 mb={3}
-                                onChange={(e)=>setGroupChatName(e.target.value)}
+                                onChange={(e) => setGroupChatName(e.target.value)}
                             />
                         </FormControl>
                         {/* add users */}
@@ -89,8 +114,38 @@ const GroupChatModal = ({children}) => {
                                 onChange={(e) => handleSearch(e.target.value)}
                             />
                         </FormControl>
-                        {/* selected users */}
+                        {/* render selected users here */}
+                        <Box
+                            w={'100%'}
+                            display={'flex'}
+                            flexWrap={'wrap'}
+                        >
+                            {
+                                selectedUsers.map((u) => (
+                                    <UserBadgeItem
+                                        key={user._id}
+                                        user={u}
+                                        handleFunction={() => handleDelete(u)}
+                                    />
+                                ))
+                            }
+                        </Box>
                         {/* render searched users */}
+                        {
+                            loading ? (
+                                <div><Spinner /></div>
+                            ) : (
+                                searchResult
+                                    // ?.slice(0, 4)
+                                    .map((user) => (
+                                        <UserListItem
+                                            key={user._id}
+                                            user={user}
+                                            handleFunction={() => handleGroup(user)}
+                                        />
+                                    ))
+                            )
+                        }
                     </ModalBody>
 
                     <ModalFooter>
