@@ -34,7 +34,7 @@ const GroupChatModal = ({ children }) => {
             // console.log(config)
             const response = await axios.get(`${BASE_URL}${APIV}${endPoints.GET_ALL_USERS}/?search=${search}`, config)
             const { data } = response
-            console.log(data)
+            
             setLoading(false)
             setSearchResult(data)
         } catch (error) {
@@ -50,8 +50,52 @@ const GroupChatModal = ({ children }) => {
         }
     }
     // submit
-    const handleSubmit = () => {
-
+    const handleSubmit = async () => {
+        if (!groupChatName || !selectedUsers) {
+            toast({
+                title: 'Please fill all the fields',
+                status: 'warning',
+                duration: 1500,
+                isClosable: true,
+                position: 'top'
+            });
+            return
+        }
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`
+                }
+            }
+            const response = await axios.post(`${BASE_URL}${APIV}${endPoints.CREATE_GROUP}`,
+                {
+                    name: groupChatName,
+                    users: JSON.stringify(selectedUsers.map((u) => u._id))
+                },
+                config
+            )
+            const { data } = response
+            setChats([data, ...chats])
+            onClose()
+            if(data){
+                toast({
+                    title: 'New Group Chat created',
+                    status: 'warning',
+                    duration: 1500,
+                    isClosable: true,
+                    position: 'top'
+                })
+            }
+        } catch (error) {
+            toast({
+                title: 'Failed to create a new group chat',
+                status: 'warning',
+                duration: 1500,
+                isClosable: true,
+                position: 'top'
+            })
+            console.log(error.message)
+        }
     }
     // handleGroup
     const handleGroup = (userToAdd) => {
@@ -72,7 +116,7 @@ const GroupChatModal = ({ children }) => {
     // handleDelete
     const handleDelete = (delUser) => {
         setSelectedUsers(
-            selectedUsers.filter((sel)=>{
+            selectedUsers.filter((sel) => {
                 return sel._id !== delUser._id
             })
         )

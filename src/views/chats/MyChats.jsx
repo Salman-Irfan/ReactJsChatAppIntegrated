@@ -26,7 +26,6 @@ const MyChats = () => {
             }
             const response = await axios.get(`${BASE_URL}${APIV}${endPoints.FETCH_CHAT}`, config)
             const { data } = response
-            console.log(data)
             setChats(data)
         } catch (error) {
             toast({
