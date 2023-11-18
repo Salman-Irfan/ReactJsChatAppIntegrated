@@ -9,7 +9,7 @@ import ChatLoading from '../../components/loaders/ChatLoading.jsx';
 import { getSender } from '../../config/ChatLogics.js';
 import GroupChatModal from '../../components/miscellaneous/GroupChatModal.jsx';
 
-const MyChats = () => {
+const MyChats = ({ fetchAgain }) => {
     // context api
     const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
     // state variables
@@ -43,7 +43,7 @@ const MyChats = () => {
     useEffect(() => {
         setLoggedUser(JSON.parse(localStorage.getItem('userInfo')));
         fetchChats()
-    }, [])
+    }, [fetchAgain])
 
     return (
         <>

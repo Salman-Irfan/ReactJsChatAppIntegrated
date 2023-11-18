@@ -34,7 +34,7 @@ const GroupChatModal = ({ children }) => {
             // console.log(config)
             const response = await axios.get(`${BASE_URL}${APIV}${endPoints.GET_ALL_USERS}/?search=${search}`, config)
             const { data } = response
-            
+
             setLoading(false)
             setSearchResult(data)
         } catch (error) {
@@ -77,7 +77,7 @@ const GroupChatModal = ({ children }) => {
             const { data } = response
             setChats([data, ...chats])
             onClose()
-            if(data){
+            if (data) {
                 toast({
                     title: 'New Group Chat created',
                     status: 'warning',
