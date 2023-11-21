@@ -9,6 +9,9 @@ import BASE_URL, { APIV } from '../../constants/baseUrl/baseUrl'
 import endPoints from '../../constants/endPoints/endPoints'
 import '../../styles/messages.css'
 import ScrollableChat from './ScrollableChat'
+import { io } from 'socket.io-client'
+
+let socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     // context api
@@ -17,6 +20,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const [messages, setMessages] = useState([])
     const [loading, setLoading] = useState(false)
     const [newMessage, setNewMessage] = useState()
+    const [socketConnected, setSocketConnected] = useState(false)
     // hooks
     const toast = useToast()
     // functions
@@ -35,10 +39,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             // api call
             const response = await axios.get(`${BASE_URL}${APIV}${endPoints.FETCH_MESSAGES}/${selectedChat._id}`, config)
             const { data } = response
-            
+
             // updating the state
             setMessages(data)
             setLoading(false)
+            // join socket room
+            socket.emit('joinChat', selectedChat._id)
         } catch (error) {
             toast({
                 title: "Error while fetching the chats",
@@ -51,10 +57,31 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             console.log(error.message)
         }
     }
+
+    // useEffect socket
+    useEffect(() => {
+        socket = io(BASE_URL)
+        socket.emit('setup', user)
+        socket.on('connection', () => setSocketConnected(true))
+    }, [])
+
     // call fetchMessages function inside use effect
     useEffect(() => {
         fetchMessages()
+        selectedChatCompare = selectedChat
     }, [selectedChat])
+
+    useEffect(() => {
+        socket.on('messageReceived', (newMessageReceived) => {
+            if (!selectedChatCompare || selectedChatCompare._id !== newMessageReceived.chat._id) {
+                // give notification
+            } else {
+                setMessages([...messages, newMessageReceived])
+            }
+        })
+
+    })
+
 
     // sendMessage
     const sendMessage = async (event) => {
@@ -77,6 +104,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                 const { data } = response
                 // set new message to empty
                 setNewMessage('')
+                // send message through socket
+                socket.emit('newMessage', data)
+                // set message to state
                 setMessages([...messages, data])
             } catch (error) {
                 toast({
@@ -91,6 +121,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             }
         }
     }
+
     // typingHandler
     const typingHandler = (e) => {
         setNewMessage(e.target.value);
@@ -147,7 +178,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                             w={'100%'}
                             h={'70vh'}
                             borderRadius={'lg'}
-                            overflowY={'hidden'}
+                            overflowY={'auto'}
                         >
                             {/* messages here */}
                             {loading ? (
