@@ -21,6 +21,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     const [loading, setLoading] = useState(false)
     const [newMessage, setNewMessage] = useState()
     const [socketConnected, setSocketConnected] = useState(false)
+    
     // hooks
     const toast = useToast()
     // functions
