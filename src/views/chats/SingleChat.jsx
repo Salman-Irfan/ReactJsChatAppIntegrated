@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ChatState } from '../../Context/ChatProvider'
 import { Box, Text, Spinner, FormControl, Input, useToast } from '@chakra-ui/react'
 import { getSender, getSenderFull } from '../../config/ChatLogics'
@@ -7,6 +7,8 @@ import UpdateGroupChatModal from '../../components/miscellaneous/UpdateGroupChat
 import axios from 'axios'
 import BASE_URL, { APIV } from '../../constants/baseUrl/baseUrl'
 import endPoints from '../../constants/endPoints/endPoints'
+import '../../styles/messages.css'
+import ScrollableChat from './ScrollableChat'
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     // context api
@@ -18,6 +20,42 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     // hooks
     const toast = useToast()
     // functions
+    const fetchMessages = async () => {
+        if (!selectedChat) {
+            return
+        }
+        try {
+            // config
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${user.token}`
+                }
+            }
+            setLoading(true)
+            // api call
+            const response = await axios.get(`${BASE_URL}${APIV}${endPoints.FETCH_MESSAGES}/${selectedChat._id}`, config)
+            const { data } = response
+            
+            // updating the state
+            setMessages(data)
+            setLoading(false)
+        } catch (error) {
+            toast({
+                title: "Error while fetching the chats",
+                description: "Can't fetched the chat.",
+                status: 'error',
+                duration: 1500,
+                isClosable: true,
+                position: 'bottom'
+            });
+            console.log(error.message)
+        }
+    }
+    // call fetchMessages function inside use effect
+    useEffect(() => {
+        fetchMessages()
+    }, [selectedChat])
+
     // sendMessage
     const sendMessage = async (event) => {
         if (event.key === 'Enter' && newMessage) {
@@ -37,7 +75,6 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                     config
                 )
                 const { data } = response
-                console.log(data)
                 // set new message to empty
                 setNewMessage('')
                 setMessages([...messages, data])
@@ -94,6 +131,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                                         <UpdateGroupChatModal
                                             fetchAgain={fetchAgain}
                                             setFetchAgain={setFetchAgain}
+                                            fetchMessages={fetchMessages}
                                         />
 
                                     </>
@@ -122,7 +160,9 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                             ) : (
                                 <div>
                                     {/* messages */}
-
+                                    <div className="messages">
+                                        <ScrollableChat messages={messages} />
+                                    </div>
                                 </div>
                             )}
                             {/* message input */}

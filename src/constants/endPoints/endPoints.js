@@ -7,5 +7,6 @@ const endPoints = {
     ADD_TO_GROUP: "/add-to-group",
     REMOVE_FROM_GROUP: "/remove-from-group",
     SEND_MESSAGE: "/message",
+    FETCH_MESSAGES: "/messages"
 }
 export default endPoints;

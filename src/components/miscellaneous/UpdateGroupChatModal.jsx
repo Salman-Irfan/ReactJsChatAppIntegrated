@@ -7,7 +7,7 @@ import BASE_URL, { APIV } from '../../constants/baseUrl/baseUrl'
 import endPoints from '../../constants/endPoints/endPoints'
 import axios from 'axios'
 import UserListItem from '../../views/users/UserListItem'
-const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
+const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
     // context menu
     const { selectedChat, setSelectedChat, user } = ChatState()
     // hooks
@@ -23,8 +23,6 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
     // functions
     const handleRemove = async (user1) => {
         // only admin can add users to group
-        console.log(selectedChat.groupAdmin._id)
-        console.log(selectedChat.groupAdmin._id)
         if (selectedChat.groupAdmin._id !== user._id) {
             toast({
                 title: "Only admins can remove users to group",
@@ -51,10 +49,9 @@ const UpdateGroupChatModal = ({ fetchAgain, setFetchAgain }) => {
                 config
             )
             const { data } = response
-            user1._id === user._id ? setSelectedChat() : (
-                setSelectedChat(data)
-            )
+            user1._id === user._id ? setSelectedChat() : ( setSelectedChat(data))
             setFetchAgain(!fetchAgain)
+            fetchMessages()
             setLoading(false)
         } catch (error) {
             toast({
