@@ -1,14 +1,64 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ChatState } from '../../Context/ChatProvider'
-import { Box, Text } from '@chakra-ui/react'
+import { Box, Text, Spinner, FormControl, Input, useToast } from '@chakra-ui/react'
 import { getSender, getSenderFull } from '../../config/ChatLogics'
 import ProfileModal from '../../components/miscellaneous/ProfileModal'
 import UpdateGroupChatModal from '../../components/miscellaneous/UpdateGroupChatModal'
+import axios from 'axios'
+import BASE_URL, { APIV } from '../../constants/baseUrl/baseUrl'
+import endPoints from '../../constants/endPoints/endPoints'
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     // context api
     const { user, selectedChat, setSelectedChat } = ChatState()
-
+    // state variables
+    const [messages, setMessages] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [newMessage, setNewMessage] = useState()
+    // hooks
+    const toast = useToast()
+    // functions
+    // sendMessage
+    const sendMessage = async (event) => {
+        if (event.key === 'Enter' && newMessage) {
+            try {
+                // config
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${user.token}`
+                    }
+                }
+                // api call
+                const response = await axios.post(`${BASE_URL}${APIV}${endPoints.SEND_MESSAGE}`, {
+                    content: newMessage,
+                    chatId: selectedChat._id
+                },
+                    config
+                )
+                const { data } = response
+                console.log(data)
+                // set new message to empty
+                setNewMessage('')
+                setMessages([...messages, data])
+            } catch (error) {
+                toast({
+                    title: "Error while sending the message",
+                    description: "Message can't be send.",
+                    status: 'error',
+                    duration: 1500,
+                    isClosable: true,
+                    position: 'bottom'
+                });
+                console.log(error)
+            }
+        }
+    }
+    // typingHandler
+    const typingHandler = (e) => {
+        setNewMessage(e.target.value);
+        // typing indicator logic here
+    }
     return (
         <>
             {
@@ -59,10 +109,35 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
                             w={'100%'}
                             h={'70vh'}
                             borderRadius={'lg'}
-                            overflow={'hidden'}
+                            overflowY={'hidden'}
                         >
+                            {/* messages here */}
+                            {loading ? (
+                                <Spinner
+                                    size={'xl'}
+                                    color='blue.300'
+                                    alignSelf={'center'}
+                                    margin={'auto'}
+                                />
+                            ) : (
+                                <div>
+                                    {/* messages */}
 
+                                </div>
+                            )}
+                            {/* message input */}
                         </Box>
+                        <FormControl
+                            onKeyDown={sendMessage}
+                            isRequired
+                            mt={3}
+                        >
+                            <Input
+                                placeholder='Press Enter to send message'
+                                onChange={typingHandler}
+                                value={newMessage}
+                            />
+                        </FormControl>
                     </>
                 ) : (
                     <Box
